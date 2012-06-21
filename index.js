@@ -20,9 +20,9 @@ function animate(lastTime, three) {
 	for (var i = 0; i < three.cubes.length; i++) {
 	  var cube = three.cubes[i];
 	  cube.position.x -= Game.speed * timeDiff;
-	  if (cube.position.x < -3000) {
-			cube.position.x = Math.random() * 5000 + 2000;
-			cube.position.z = Math.random() * 800 + 400;
+	  if (cube.position.x < -1500) {
+			cube.position.x = Math.random() * 500 + 1500;
+			cube.position.z = Math.random() * 800 - 400;
 	  }
 	  //console.log(cube.position.x);
 	}
@@ -35,18 +35,26 @@ function animate(lastTime, three) {
   }
 
 	if (Game.keysPressed["space"]) {
-		three.sphere.position.z = 400;
+		Game.started = true;
+		three.sphere.position.z = Game.startPosition;
 		three.sphere.fallSpeed = 0;
 	}
 	
-	three.sphere.fallSpeed += Game.gravity * timeDiff;
-  three.sphere.position.z += three.sphere.fallSpeed * timeDiff;
-	if (collides(three.cubes, three.sphere)) {
-		three.sphere.fallSpeed *= -1 * 1.1;
-		three.sphere.fallSpeed = Math.min(three.sphere.fallSpeed, Game.maxFallSpeed);
-		three.sphere.fallSpeed = Math.max(three.sphere.fallSpeed, -Game.maxFallSpeed);
+	if (Game.started) {
+		three.sphere.fallSpeed += Game.gravity * timeDiff;
+		three.sphere.position.z += three.sphere.fallSpeed * timeDiff;
+		if (collides(three.cubes, three.sphere)) {
+			three.sphere.fallSpeed *= -1 * 1.08;
+			three.sphere.fallSpeed = Math.min(three.sphere.fallSpeed, Game.maxFallSpeed);
+			three.sphere.fallSpeed = Math.max(three.sphere.fallSpeed, Game.minBounceSpeed);
+		}
 	}
-
+	
+	if (three.sphere.position.z < -1000) {
+		Game.started = false;
+		reset();
+	}
+	
   lastTime = time;
 
   // render
@@ -57,6 +65,11 @@ function animate(lastTime, three) {
     animate(lastTime, three);
   });
 };
+
+function reset() {
+	Game.three.sphere.position.z = Game.startPosition;
+	Game.three.sphere.position.x = 0;
+}
 
 function collides(list, object) {
 	for (var i = 0; i < list.length; i++) {
@@ -96,7 +109,7 @@ window.onload = function () {
   var cubes = new Array();
   for (var i = 0; i < 15; i++) {
     var cube = new THREE.Mesh(new THREE.CubeGeometry(400, 50, 20), blueMaterial);
-    cube.position.x = Math.random() * 5000 + 2000;
+    cube.position.x = Math.random() * 5000 + 1500;
     cube.position.z = Math.random() * 800 - 400;
 		cube.width = 400;
 		cube.height = 20;
@@ -109,7 +122,7 @@ window.onload = function () {
   // sphere
 
   var sphere = new THREE.Mesh(new THREE.SphereGeometry(10, 32, 32), greenMaterial);
-  sphere.position.z = 1000;
+  sphere.position.z = Game.startPosition;
 	sphere.fallSpeed = 0;
   scene.add(sphere);
 
@@ -155,8 +168,11 @@ var initKeyboardEvent = function () {
 var Game = {
   three: undefined,
   speed: 0.4,
-  gravity: -0.0008,
+  gravity: -0.002,
   ballSpeed: 0.7,
-  maxFallSpeed: 1,
+  maxFallSpeed: 1.2,
+	minBounceSpeed: 1,
   keysPressed: new Array(),
+	started: false,
+	startPosition: 400
 };
