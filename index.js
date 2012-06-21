@@ -55,6 +55,14 @@ function animate(lastTime, three) {
 		reset();
 	}
 	
+	//TODO camera
+	// 600
+	//three.camera.position.y = 600 * Math.sin(time / 1000);
+  //three.camera.position.x = 600 * Math.cos(time / 1000);
+	//three.camera.position.z = three.sphere.position.z;
+	three.camera.position.y = -1200 - (-three.sphere.position.z / 2);
+	//three.camera.lookAt(new THREE.Vector3(0, 0, 0));
+	
   lastTime = time;
 
   // render
@@ -94,11 +102,12 @@ window.onload = function () {
   // scene
   var scene = new THREE.Scene();
 
-  // camera
+  // camera 
   var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 2000);
   camera.position.y = -600;
   camera.position.z = 800;
-  camera.rotation.x = 45 * (Math.PI / 180);
+  //camera.rotation.x = 45 * (Math.PI / 180);
+	camera.lookAt(new THREE.Vector3(0, 0, 400));
   scene.add(camera);
 
 
